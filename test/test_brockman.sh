@@ -73,6 +73,27 @@ test_failure() {
     fi
 }
 
+test_view() {
+    alert_message='alert_log'
+    error_message='error_log'
+
+    echo "$alert_message" > $BROCKMAN_ALERT_LOG
+    echo "$error_message" > $BROCKMAN_ERROR_LOG
+
+    alert_view=$($PATH_TO_BROCKMAN --view alert)
+    error_view=$($PATH_TO_BROCKMAN --view error)
+
+    if [ "$alert_view" != "$alert_message" ]
+    then
+        log_error "--view alert should display $alert_message"
+    fi
+
+    if [ "$error_view" != "$error_message" ]
+    then
+        log_error "--view error should display $error_message"
+    fi
+}
+
 test_resolve() {
     echo 'error' | tee $BROCKMAN_ALERT_LOG $BROCKMAN_ERROR_LOG >/dev/null
 
@@ -97,6 +118,7 @@ trap 'restore_initial_state' EXIT
 setup
 test_option_processing
 test_failure
+test_view
 test_resolve
 
 exit 0

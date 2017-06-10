@@ -21,7 +21,13 @@ failure() {
 }
 
 view() {
-    exit 0
+    if [ "$1" = "alert" ]
+    then
+        cat $BROCKMAN_ALERT_LOG
+    elif [ "$1" = "error" ]
+    then
+        cat $BROCKMAN_ERROR_LOG
+    fi
 }
 
 resolve() {
