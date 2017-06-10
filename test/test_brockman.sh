@@ -44,20 +44,70 @@ test_option_processing() {
     for invalid_command in ${invalid_commands[@]}
     do
         $PATH_TO_BROCKMAN $invalid_command 2>/dev/null
-        status_code=$?
+        exit_code=$?
 
-        if [ "$status_code" -eq 0 ]
+        if [ "$exit_code" -eq 0 ]
         then
             log_error "Invalid command $invalid_command did not cause error"
         fi
     done
 }
 
+test_report_success() {
+    success_script="$BROCKMAN_DIR/success_script.sh"
+    cat << EOF > $success_script
+#!/bin/bash
+echo \$1
+exit 0
+EOF
+
+    chmod u+x $success_script
+
+    $PATH_TO_BROCKMAN --report "$success_script ARGUMENT"
+
+    if $PATH_TO_BROCKMAN --view alert | grep -q "$success_script"
+    then
+        log_error "--report should not log alert containing $success_script"
+    fi
+
+    if $PATH_TO_BROCKMAN --view error | grep -q "ARGUMENT"
+    then
+        log_error "--report should not log error containing ARGUMENT"
+    fi
+
+    $PATH_TO_BROCKMAN --resolve
+}
+
+test_report_failure() {
+    error_script="$BROCKMAN_DIR/error_script.sh"
+    cat << EOF > $error_script
+#!/bin/bash
+echo \$1 >&2
+exit 1
+EOF
+
+    chmod u+x $error_script
+
+    $PATH_TO_BROCKMAN --report "$error_script ARGUMENT"
+
+    if ! $PATH_TO_BROCKMAN --view alert | grep -q "$error_script"
+    then
+        log_error "--report should log alert containing $error_script"
+    fi
+
+    if ! $PATH_TO_BROCKMAN --view error | grep -q "ARGUMENT"
+    then
+        log_error "--report should log error containing ARGUMENT"
+    fi
+
+    $PATH_TO_BROCKMAN --resolve
+}
+
 test_failure() {
     $PATH_TO_BROCKMAN --failure
-    status_code=$?
+    exit_code=$?
 
-    if [ "$status_code" -ne 1 ]
+    if [ "$exit_code" -ne 1 ]
     then
         log_error "--failure should fail when there is no error."
     fi
@@ -65,12 +115,14 @@ test_failure() {
     echo 'error' > $BROCKMAN_ALERT_LOG
 
     $PATH_TO_BROCKMAN --failure
-    status_code=$?
+    exit_code=$?
 
-    if [ "$status_code" -ne 0 ]
+    if [ "$exit_code" -ne 0 ]
     then
         log_error "--failure should succeed when errors exist."
     fi
+
+    $PATH_TO_BROCKMAN --resolve
 }
 
 test_view() {
@@ -92,6 +144,8 @@ test_view() {
     then
         log_error "--view error should display $error_message"
     fi
+
+    $PATH_TO_BROCKMAN --resolve
 }
 
 test_resolve() {
@@ -117,6 +171,8 @@ trap 'restore_initial_state' EXIT
 
 setup
 test_option_processing
+test_report_success
+test_report_failure
 test_failure
 test_view
 test_resolve
