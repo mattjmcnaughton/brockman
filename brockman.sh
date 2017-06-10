@@ -14,7 +14,10 @@ report() {
 }
 
 failure() {
-    exit 0
+    if [ ! -s "$BROCKMAN_ALERT_LOG" ]
+    then
+        exit 1
+    fi
 }
 
 view() {

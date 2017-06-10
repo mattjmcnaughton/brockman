@@ -18,12 +18,21 @@ export BROCKMAN_DIR="$(mktemp -d)"
 BROCKMAN_ALERT_LOG="$BROCKMAN_DIR/alert.log"
 BROCKMAN_ERROR_LOG="$BROCKMAN_DIR/error.log"
 
-if [ ! -d "$BROCKMAN_DIR" ]
-then
-    mkdir $BROCKMAN_DIR
-fi
+setup() {
+    if [ ! -d "$BROCKMAN_DIR" ]
+    then
+        mkdir $BROCKMAN_DIR
+    fi
 
-# Test passing invalid options to `brockman.sh` fails.
+    touch $BROCKMAN_ALERT_LOG
+    touch $BROCKMAN_ERROR_LOG
+}
+
+log_error() {
+    echo "$1" >&2
+    exit 1
+}
+
 test_option_processing() {
     invalid_commands=(
         --report
@@ -39,14 +48,32 @@ test_option_processing() {
 
         if [ "$status_code" -eq 0 ]
         then
-            echo "Invalid command $invalid_command did not cause error" >&2
-            exit 1
+            log_error "Invalid command $invalid_command did not cause error"
         fi
     done
 }
 
+test_failure() {
+    $PATH_TO_BROCKMAN --failure
+    status_code=$?
+
+    if [ "$status_code" -ne 1 ]
+    then
+        log_error "--failure should fail when there is no error."
+    fi
+
+    echo 'error' > $BROCKMAN_ALERT_LOG
+
+    $PATH_TO_BROCKMAN --failure
+    status_code=$?
+
+    if [ "$status_code" -ne 0 ]
+    then
+        log_error "--failure should succeed when errors exist."
+    fi
+}
+
 test_resolve() {
-    # Set up test info in $BROCKMAN_ALERT_LOG and $BROCKMAN_ERROR_LOG
     echo 'error' | tee $BROCKMAN_ALERT_LOG $BROCKMAN_ERROR_LOG >/dev/null
 
     $PATH_TO_BROCKMAN --resolve
@@ -60,15 +87,16 @@ test_resolve() {
     do
         if [ -s "$log_file" ]
         then
-            echo "--resolve should have cleared out: $log_file."
-            exit 1
+            log_error "--resolve should have cleared out: $log_file."
         fi
     done
 }
 
 trap 'restore_initial_state' EXIT
 
+setup
 test_option_processing
+test_failure
 test_resolve
 
 exit 0
