@@ -5,7 +5,7 @@
 
 set -e
 
-BROCKMAN_DIR=~/.brockman
+BROCKMAN_DIR="${BROCKMAN_DIR:?~/.brockman}"
 BROCKMAN_ALERT_LOG="$BROCKMAN_DIR/alert.log"
 BROCKMAN_ERROR_LOG="$BROCKMAN_DIR/error.log"
 
@@ -22,7 +22,16 @@ view() {
 }
 
 resolve() {
-    exit 0
+    log_files=(
+        $BROCKMAN_ALERT_LOG
+        $BROCKMAN_ERROR_LOG
+    )
+
+    for log_file in ${log_files[@]}
+    do
+        rm $log_file
+        touch $log_file
+    done
 }
 
 ALLOWED_VIEW_TYPES="^(alert|error)$"
