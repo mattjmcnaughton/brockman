@@ -2,6 +2,9 @@
 
 ![Image of Kent Brockman](logo/brockman.png)
 
+[![Build
+Status](https://travis-ci.org/mattjmcnaughton/brockman.svg?branch=master)](https://travis-ci.org/mattjmcnaughton/brockman)
+
 *brockman* is a lightweight bash utility for reporting on background unix
 processes.
 
