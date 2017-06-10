@@ -73,6 +73,13 @@ Contributions are welcome :dog: Please open an
 [issue](https://github.com/mattjmcnaughton/brockman/issues) or [pull
 request](https://github.com/mattjmcnaughton/brockman/pulls).
 
+Please include tests with any pull requests. The test suite can be run with the
+following command:
+
+```
+bash test/test_brockman.sh
+```
+
 ## License
 
 [Apache](https://github.com/mattjmcnaughton/brockman/blob/master/LICENSE).
