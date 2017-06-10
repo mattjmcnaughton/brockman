@@ -65,6 +65,18 @@ resolve() {
 
 ALLOWED_VIEW_TYPES="^(alert|error)$"
 
+setup() {
+    if [ ! -d "$BROCKMAN_DIR" ]
+    then
+        mkdir $BROCKMAN_DIR
+    fi
+
+    touch $BROCKMAN_ALERT_LOG
+    touch $BROCKMAN_ERROR_LOG
+}
+
+setup
+
 case $1 in
 --report)
     if [ $# -lt 2 ]
