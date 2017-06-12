@@ -35,10 +35,10 @@ log_error() {
 
 test_option_processing() {
     invalid_commands=(
-        --report
-        --fake-argument
-        --view
-        --view\ INVALID_TYPE
+        report
+        fake-argument
+        view
+        view\ INVALID_TYPE
     )
 
     for invalid_command in ${invalid_commands[@]}
@@ -63,19 +63,19 @@ EOF
 
     chmod u+x $success_script
 
-    $PATH_TO_BROCKMAN --report "$success_script ARGUMENT"
+    $PATH_TO_BROCKMAN report "$success_script ARGUMENT"
 
-    if $PATH_TO_BROCKMAN --view alert | grep -q "$success_script"
+    if $PATH_TO_BROCKMAN view alert | grep -q "$success_script"
     then
-        log_error "--report should not log alert containing $success_script"
+        log_error "report should not log alert containing $success_script"
     fi
 
-    if $PATH_TO_BROCKMAN --view error | grep -q "ARGUMENT"
+    if $PATH_TO_BROCKMAN view error | grep -q "ARGUMENT"
     then
-        log_error "--report should not log error containing ARGUMENT"
+        log_error "report should not log error containing ARGUMENT"
     fi
 
-    $PATH_TO_BROCKMAN --resolve
+    $PATH_TO_BROCKMAN resolve
 }
 
 test_report_failure() {
@@ -88,41 +88,41 @@ EOF
 
     chmod u+x $error_script
 
-    $PATH_TO_BROCKMAN --report "$error_script ARGUMENT"
+    $PATH_TO_BROCKMAN report "$error_script ARGUMENT"
 
-    if ! $PATH_TO_BROCKMAN --view alert | grep -q "$error_script"
+    if ! $PATH_TO_BROCKMAN view alert | grep -q "$error_script"
     then
-        log_error "--report should log alert containing $error_script"
+        log_error "report should log alert containing $error_script"
     fi
 
-    if ! $PATH_TO_BROCKMAN --view error | grep -q "ARGUMENT"
+    if ! $PATH_TO_BROCKMAN view error | grep -q "ARGUMENT"
     then
-        log_error "--report should log error containing ARGUMENT"
+        log_error "report should log error containing ARGUMENT"
     fi
 
-    $PATH_TO_BROCKMAN --resolve
+    $PATH_TO_BROCKMAN resolve
 }
 
 test_failure() {
-    $PATH_TO_BROCKMAN --failure
+    $PATH_TO_BROCKMAN failure
     exit_code=$?
 
     if [ "$exit_code" -ne 1 ]
     then
-        log_error "--failure should fail when there is no error."
+        log_error "failure should fail when there is no error."
     fi
 
     echo 'error' > $BROCKMAN_ALERT_LOG
 
-    $PATH_TO_BROCKMAN --failure
+    $PATH_TO_BROCKMAN failure
     exit_code=$?
 
     if [ "$exit_code" -ne 0 ]
     then
-        log_error "--failure should succeed when errors exist."
+        log_error "failure should succeed when errors exist."
     fi
 
-    $PATH_TO_BROCKMAN --resolve
+    $PATH_TO_BROCKMAN resolve
 }
 
 test_view() {
@@ -132,26 +132,26 @@ test_view() {
     echo "$alert_message" > $BROCKMAN_ALERT_LOG
     echo "$error_message" > $BROCKMAN_ERROR_LOG
 
-    alert_view=$($PATH_TO_BROCKMAN --view alert)
-    error_view=$($PATH_TO_BROCKMAN --view error)
+    alert_view=$($PATH_TO_BROCKMAN view alert)
+    error_view=$($PATH_TO_BROCKMAN view error)
 
     if [ "$alert_view" != "$alert_message" ]
     then
-        log_error "--view alert should display $alert_message"
+        log_error "view alert should display $alert_message"
     fi
 
     if [ "$error_view" != "$error_message" ]
     then
-        log_error "--view error should display $error_message"
+        log_error "view error should display $error_message"
     fi
 
-    $PATH_TO_BROCKMAN --resolve
+    $PATH_TO_BROCKMAN resolve
 }
 
 test_resolve() {
     echo 'error' | tee $BROCKMAN_ALERT_LOG $BROCKMAN_ERROR_LOG >/dev/null
 
-    $PATH_TO_BROCKMAN --resolve
+    $PATH_TO_BROCKMAN resolve
 
     log_files=(
         $BROCKMAN_ALERT_LOG
@@ -162,7 +162,7 @@ test_resolve() {
     do
         if [ -s "$log_file" ]
         then
-            log_error "--resolve should have cleared out: $log_file."
+            log_error "resolve should have cleared out: $log_file."
         fi
     done
 }
