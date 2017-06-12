@@ -78,10 +78,10 @@ setup() {
 setup
 
 case $1 in
---report)
+report)
     if [ $# -lt 2 ]
     then
-        echo "Must pass a command to \`--report\`." >&2
+        echo "Must pass a command to \`report\`." >&2
         exit 2
     fi
 
@@ -91,19 +91,19 @@ case $1 in
     shift
     report "$@"
     ;;
---failure)
+failure)
     failure
     ;;
---view)
+view)
     if [ $# -ne 2 ] && ! echo "$2" | grep -q "$ALLOWED_VIEW_TYPES"
     then
-        echo "Must pass a $ALLOWED_VIEW_TYPES to \`--view\`." >&2
+        echo "Must pass a $ALLOWED_VIEW_TYPES to \`view\`." >&2
         exit 2
     fi
 
     view "$2"
     ;;
---resolve)
+resolve)
     resolve
     ;;
 *)

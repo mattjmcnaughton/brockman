@@ -30,13 +30,13 @@ failure, *brockman* will log both an `alert` that the task failed, and an
 `error` log of the failure. It logs these errors to
 `~/.brockman/{alert,error}.log` respectively.
 
-Ex: `brockman.sh --report "clamscan -r ~/"`
+Ex: `brockman.sh report "clamscan -r ~/"`
 
 ### Failure
 
 `failure` succeeds if *brockman* has unresolved errors, and fails if not.
 
-Ex: `brockman.sh --failure`
+Ex: `brockman.sh failure`
 
 ### View
 
@@ -44,7 +44,7 @@ Ex: `brockman.sh --failure`
 which is a brief description of the command which failed, or the `error` log,
 which is the entire output of `stderr` for the failed command.
 
-Ex: `brockman.sh --view [alert|error]`
+Ex: `brockman.sh view [alert|error]`
 
 ### Resolve
 
@@ -52,7 +52,7 @@ Ex: `brockman.sh --view [alert|error]`
 call it after you've copied whatever info you need from *brockman* logs to a
 more permanent location.
 
-Ex: `brockman.sh --resolve`
+Ex: `brockman.sh resolve`
 
 ## Use cases
 
@@ -60,12 +60,12 @@ Ex: `brockman.sh --resolve`
 a single task well.
 
 I use it for monitoring nightly updates, anti-virus scans, and local ansible
-playbook runs. I run these cron jobs with `brockman.sh --report "$CMD"` and then
-add `brockman.sh --failure` to alert if one of these tasks failed when I open a
-new shell. If there has been a failure, I use `brockman.sh --view alert` and
-`brockman.sh --view error` to investigate further. Finally, after resolving the
-issue, I run `brockman.sh --resolve` so *brockman* won't alert me to this error
-again.
+playbook runs. I run these cron jobs with `brockman.sh report "$CMD"` and then
+add `brockman.sh failure` to my `~/.bashrc` to alert if one of
+these tasks failed when I open a new shell. If there has been a failure,
+I use `brockman.sh view alert` and `brockman.sh view error` to investigate further.
+Finally, after resolving the issue, I run `brockman.sh resolve`
+so *brockman* won't alert me to this error again.
 
 ## Contributing
 
