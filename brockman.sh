@@ -14,6 +14,13 @@ readonly BROCKMAN_ERROR_LOG="$BROCKMAN_DIR/error.log"
 # Only certain options can be passed to the view command (representing the `{alert,error}.log`).
 readonly ALLOWED_VIEW_TYPES="^(alert|error)$"
 
+# Make the path within this script as restrictive as possible.
+export PATH=/bin:/usr/bin
+
+# Only the `$USER` can read/write files created in this process
+# (i.e. 600).
+umask 0177
+
 # The report processes which its file to a temporary file while running. Then, if the report command
 # exits in failure, we copy the error file over to `$BROCKMAN_ERROR_LOG`. We want to use a different
 # temporary error file each time.
